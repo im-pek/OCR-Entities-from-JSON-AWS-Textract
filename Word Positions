@@ -1,0 +1,58 @@
+dic_of_dics = {} # Input JSON dictionary here, as output by AWS Textract
+
+import os
+import os.path
+from os import path
+
+dictlist = []
+for key, value in dic_of_dics.items():
+    temp = [key,value]
+    dictlist.append(temp)
+
+lists=[]
+
+for item in dictlist:
+    for thing in item:
+        lists.append(list(thing))
+
+#print (lists)
+#print (lists[3])
+
+print (len(lists[3])) #number of 'Text' entries
+
+all_texts=[]
+
+for ix, item in enumerate(lists[3]):
+    dictionaryy = lists[3][ix]
+    #print (dictionaryy)
+    #print ('\n')
+    text = dictionaryy.get('Text')
+    geometry = dictionaryy.get('Geometry')
+    #print (get_text)
+    #print ('\n')
+    bounding_box = geometry.get('BoundingBox')
+    polygon = geometry.get('Polygon')
+    polygon1 = polygon[0]
+    polygon2 = polygon[1]
+    polygon3 = polygon[2]
+    polygon4 = polygon[3]
+    #print (bounding_box)
+    #print ('\n')
+    width = bounding_box.get('Width')
+    height = bounding_box.get('Height')
+    left = bounding_box.get('Left')
+    top = bounding_box.get('Top')
+    if text != None:
+        details = [text, width, height, left, top, polygon1, polygon2, polygon3, polygon4] # word positions
+        print (details)
+        print ('\n')
+        all_texts.append(text)
+        with open('L:\My Documents\Desktop\see details.txt', 'a') as out_file:
+             out_file.write(str(details) + '\n')
+
+if path.exists(r'L:\My Documents\Desktop\see details.csv'):
+    os.remove(r'L:\My Documents\Desktop\see details.csv')
+    
+os.rename('L:\My Documents\Desktop\see details.txt','L:\My Documents\Desktop\see details.csv') # converts text file to csv file
+    
+print (all_texts)
