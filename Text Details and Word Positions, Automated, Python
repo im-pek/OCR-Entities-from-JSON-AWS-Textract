@@ -1,0 +1,89 @@
+import os
+import os.path
+from os import path
+import json
+from datetime import datetime
+
+dateTimeObj = datetime.now()
+dateObj = dateTimeObj.date()
+dateStr = dateObj.strftime("%d %b %Y ") #current date to label output file
+time = str(dateTimeObj.hour) + '`' + str(dateTimeObj.minute) + '`' + str(dateTimeObj.second) #current time to label output file
+
+titles = ['Text', 'Width', 'Height', 'Left', 'Top', 'Polygon 1', 'Polygon 2', 'Polygon 3', 'Polygon 4', 'File Name']
+
+#working_dir_path = pathlib.Path().absolute() #directory path of where this python file is saved
+
+working_dir_paths = "L:\\My Documents\\Desktop\\All Scans - JSON" #chosen directory of file inputs
+arr = os.listdir(working_dir_paths) #list of file names in this directory
+
+name_file_txt = 'L:\\My Documents\\Desktop\\See Details (' + dateStr + time + ').txt' #chosen file name of output txt file
+name_file_csv = 'L:\\My Documents\\Desktop\\See Details (' + dateStr + time + ').csv' #chosen file name of output csv file
+
+file = open(name_file_txt, "w")
+file.write(str(titles) + '\n')
+file.close()
+
+alls_full_directories = []
+all_all_texts = []
+
+for array in arr:
+    full_files = str(working_dir_paths) + '\\' + array
+    alls_full_directories.append(full_files)
+
+for index,file_name in enumerate(alls_full_directories):
+   
+    print (arr[index])
+   
+    with open(file_name, 'rb') as f:
+        if f:
+            dic_of_dics = json.load(f, strict = False)
+        else:
+            pass
+    dictlist = []
+    for key, value in dic_of_dics.items():
+        temp = [key,value]
+        dictlist.append(temp)
+   
+    lists=[]
+   
+    for item in dictlist:
+        for thing in item:
+            lists.append(list(thing))
+       
+    print ('No. of Text Entries:', len(lists[3]))
+    print ('\n')
+   
+    all_texts=[]
+   
+    for ix,item in enumerate(lists[3]):
+        dictionaryy = lists[3][ix]
+        text = dictionaryy.get('Text')
+        geometry = dictionaryy.get('Geometry')
+        bounding_box = geometry.get('BoundingBox')
+        polygon = geometry.get('Polygon')
+        polygon1 = polygon[0]
+        polygon2 = polygon[1]
+        polygon3 = polygon[2]
+        polygon4 = polygon[3]
+        width = bounding_box.get('Width')
+        height = bounding_box.get('Height')
+        left = bounding_box.get('Left')
+        top = bounding_box.get('Top')
+       
+        if text != None:
+            details = [text, width, height, left, top, polygon1, polygon2, polygon3, polygon4, arr[index]]
+            all_texts.append(text)
+            f = open(name_file_txt, "a")
+            f.write(str(details) + '\n')
+            f.close()
+           
+    #print (all_texts) #PRINTS TEXTS IN 1 FILE
+   
+    all_all_texts.append(all_texts)
+
+#print (all_all_texts) #PRINTS TEXTS IN ALL FILES IN ITS FOLDER
+
+if path.exists(name_file_csv):
+    os.remove(name_file_csv)
+   
+os.rename(name_file_txt, name_file_csv)
